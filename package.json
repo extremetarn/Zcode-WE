@@ -1,0 +1,15 @@
+{
+  "name": "zcode-we",
+  "version": "0.1.0",
+  "description": "Wallpaper Engine backgrounds, window composition and appearance controls for ZCode.",
+  "private": true,
+  "license": "MIT",
+  "author": "extremetarn",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test test/*.test.cjs",
+    "build:native": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File native/build.ps1",
+    "test:native": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-native.ps1"
+  },
+  "repository": { "type": "git", "url": "https://github.com/extremetarn/Zcode-WE.git" }
+}

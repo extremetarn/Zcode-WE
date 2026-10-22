@@ -1,0 +1,9 @@
+{
+  "packageId": "Newtonsoft.Json",
+  "version": "13.0.3",
+  "url": "https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg",
+  "packageSha256": "872FC189E638AB1056555B03AAA38F68BCB54286E221AA646EB1129BABF63C77",
+  "assemblyEntry": "lib/net45/Newtonsoft.Json.dll",
+  "assemblySha256": "E1E27AF7B07EEEDF5CE71A9255F0422816A6FC5849A483C6714E1B472044FA9D",
+  "licenseEntry": "LICENSE.md"
+}

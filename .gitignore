@@ -1,0 +1,23 @@
+# Local builds and downloaded dependencies
+/native/bin/
+/native/lib/
+/native/.packages/
+/node_modules/
+/dist/
+/artifacts/
+/work/
+/outputs/
+*.log
+*.tmp
+*.bak
+*.pdb
+*.zip
+.env
+.env.*
+!.env.example
+adapter-state.json
+runtime-files.json
+config.json
+prepared-*/
+.DS_Store
+Thumbs.db
