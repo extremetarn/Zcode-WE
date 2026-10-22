@@ -13,7 +13,15 @@ function Start-Helper {
     $info.RedirectStandardInput = $true
     $info.RedirectStandardOutput = $true
     $info.RedirectStandardError = $true
-    return [Diagnostics.Process]::Start($info)
+    # .NET Framework inherits this encoding for the redirected stdin writer.
+    # Match the production Node bridge: UTF-8 JSON lines without a BOM.
+    $originalEncoding = [Console]::InputEncoding
+    try {
+        [Console]::InputEncoding = New-Object Text.UTF8Encoding($false)
+        return [Diagnostics.Process]::Start($info)
+    } finally {
+        [Console]::InputEncoding = $originalEncoding
+    }
 }
 function Read-Message($Process, [string]$Context = 'protocol response', [int]$TimeoutMs = 5000) {
     $read = $Process.StandardOutput.ReadLineAsync()

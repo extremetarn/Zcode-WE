@@ -78,7 +78,14 @@ function Start-Helper {
     $info.RedirectStandardInput = $true
     $info.RedirectStandardOutput = $true
     $info.RedirectStandardError = $true
-    $p = [Diagnostics.Process]::Start($info)
+    # Match the production bridge even when the parent console uses a UTF-8 BOM.
+    $originalEncoding = [Console]::InputEncoding
+    try {
+        [Console]::InputEncoding = New-Object Text.UTF8Encoding($false)
+        $p = [Diagnostics.Process]::Start($info)
+    } finally {
+        [Console]::InputEncoding = $originalEncoding
+    }
     $script:helpers += $p
     [void](Read-Message $p)
     return $p
