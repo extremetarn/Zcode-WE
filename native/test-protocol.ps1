@@ -15,9 +15,9 @@ function Start-Helper {
     $info.RedirectStandardError = $true
     return [Diagnostics.Process]::Start($info)
 }
-function Read-Message($Process) {
+function Read-Message($Process, [string]$Context = 'protocol response', [int]$TimeoutMs = 5000) {
     $read = $Process.StandardOutput.ReadLineAsync()
-    if (-not $read.Wait(5000)) { throw 'Helper response timed out' }
+    if (-not $read.Wait($TimeoutMs)) { throw "Helper timed out waiting for $Context after $TimeoutMs ms (exited: $($Process.HasExited))" }
     if ($null -eq $read.Result) { throw ('Helper closed stdout: ' + $Process.StandardError.ReadToEnd()) }
     return ($read.Result | ConvertFrom-Json)
 }
@@ -25,14 +25,16 @@ function Request($Process, [string]$Line, $Id) {
     $Process.StandardInput.WriteLine($Line)
     $Process.StandardInput.Flush()
     for ($n = 0; $n -lt 20; $n++) {
-        $reply = Read-Message $Process
+        $reply = Read-Message $Process "request id $Id"
         if ($null -ne $reply.PSObject.Properties['id'] -and $reply.id -eq $Id) { return $reply }
     }
     throw 'Missing matching response id'
 }
 $proc = Start-Helper
 try {
-    $hello = Read-Message $proc
+    # A fresh Windows runner may need extra time to initialize .NET and WPF.
+    # Keep request deadlines short once the startup greeting has arrived.
+    $hello = Read-Message $proc 'startup greeting' 30000
     Assert-True ($hello.event -eq 'hello' -and $hello.protocol -eq 1) 'Missing protocol greeting'
     $reply = Request $proc '{"id":1,"command":"status"}' 1
     Assert-True ($reply.ok -and $reply.state -eq 'idle' -and $reply.runtimePid -eq 0) 'Unexpected initial state'
@@ -66,7 +68,7 @@ try {
 }
 $proc = Start-Helper
 try {
-    [void](Read-Message $proc)
+    [void](Read-Message $proc 'EOF-test startup greeting' 30000)
     $proc.StandardInput.Close()
     Assert-True ($proc.WaitForExit(5000) -and $proc.ExitCode -eq 0) 'Stdin EOF failed to exit cleanly'
 } finally {
